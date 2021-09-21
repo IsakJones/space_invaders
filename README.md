@@ -1,6 +1,6 @@
 # Space Invaders
 
-This project is my own take on the legendary Space Invaders game.
+This project is my own take on the classic Space Invaders game.
 
 To play the game, run the main.py file.
 

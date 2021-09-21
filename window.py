@@ -1,19 +1,30 @@
+"""
+DOCSTRING
+
+This file includes all objects handling visual changes.
+
+The Background object is necessary for the custom scrolling, and only used for that.
+In fact, only the Window object calls it, hence I've included them in the same file.
+
+The Window object handles all surfaces on display. It also handles the clock, which 
+dictates the game's pace, and includes an attribute tracking the frame number, which is
+important for many methods. The background, hearts, and castles are also attributes.
+"""
 import pygame
 import os
 
-
+from base import Base
 from space_ship import SpaceShip
-from enums import Colors, Ship, Invader
+from enums import Paths, Colors, Text, Win, Health
 from space_invader import SpaceInvader
 
 
-class Background(pygame.sprite.Sprite): # Look up what this means!
-    def __init__(self, path: os.path):
-        pygame.sprite.Sprite.__init__(self)  # call Sprite initializer
+class Background(): 
+    def __init__(self, path: os.path): 
         self.image = pygame.image.load(path)
         self.height = self.image.get_height() 
         self.rect = self.image.get_rect()
-        self.rect.left, self.rect.top = (0, 0)
+        # self.rect.left, self.rect.top = (0, 0)
         # The next attributes  are necessary for rotation
         self.rotation = 270
         self.rotated = pygame.transform.rotate(self.image, self.rotation)
@@ -29,22 +40,41 @@ class Background(pygame.sprite.Sprite): # Look up what this means!
 
     
 class Window():
-    def __init__(self, width: int, height: int, caption: str, path: os.path):
+    def __init__(
+        self,
+        fps: int,
+        width: int, 
+        height: int, 
+        font: os.path,
+        background: os.path
+    ):
+        self.fps = fps
         self.width = width
         self.height = height
         self.win = pygame.display.set_mode((width, height))
-        pygame.display.set_caption(caption)
-        self.background = Background(path)
+        self.background = Background(background)
+        self.font  = font
+        self.clock = pygame.time.Clock()
+        # self.title = pygame.transform.scale(
+        #     pygame.image.load(title),
+        #     (Title.WIDTH.value, Title.HEIGHT.value)
+        # )#.convert_alpha()
+        self.frame = 0 # The current nth frame.
+        self.heart = pygame.transform.scale(
+            pygame.image.load(
+                Paths.HEART.value
+            ),
+            (Health.HEART_WIDTH.value, Health.HEIGHT.value)
+        )
+        self.castle = pygame.transform.scale(
+            pygame.image.load(
+                Paths.CASTLE.value
+            ),
+            (Health.HEIGHT.value, Health.HEIGHT.value)
+        )
+        pygame.display.set_caption("Space Invaders!")
 
-    def fill_black(self) -> None:
-        # Fills the background with black, just in case.
-        self.win.fill(Colors.BLACK.value)
-
-    def update(self) -> None:
-        # Updates the whole screen, necessary for each frame
-        pygame.display.update()
-
-    def scroll(self, frame: int) -> None:
+    def scroll(self) -> None:
         """
         Adds backgorund image and infinite scrolling.
         Once the background is scrolled over (i.e. once the original image's 
@@ -52,7 +82,7 @@ class Window():
         rises below it, rotated by 270 degrees.
         """
         # Adds background image and infinite scrolling
-        frame = frame % self.background.height
+        frame = self.frame % self.background.height
         # If the old background has been completely scrolled over, 
         # make the old background the new background
         if frame == 0:
@@ -68,20 +98,116 @@ class Window():
                 self.background.rect_desc(offset)
             )
 
-    def update_ship(self, ship: SpaceShip, keys_pressed) -> None:
-        # Updates the location of the ship
-        ship.move(keys_pressed)
-        self.win.blit(ship.get_image(), ship.get_rect())
+    def title(self) -> None:
+        """
+        Displays the title according to the title_time in Text.
+        """
+        if self.frame > Text.TITLE_TIME.value:
+            return None
 
-    def update_invaders(self, frame: int, ship: SpaceShip, invaders: list) -> None:
-        # Updates the location of the invader
-        for invader in invaders:
-            if invader.rect.y > Ship.INITY.value - Invader.WIDTH.value:
-                ship.death(invader)
-            invader.move(frame)
-            self.win.blit(invader.get_image(), invader.get_rect())
+        title_text = pygame.font.Font(
+            Paths.FONT.value,
+            Text.TITLE_SIZE.value
+        ).render(Text.TITLE_TEXT.value, 1, Colors.WHITE.value)
+        title_x = Win.WIDTH.value//2 - title_text.get_width()//2
+        title_y = int(Win.HEIGHT.value * Text.TITLE_HEIGHT.value)
 
+        self.win.blit(
+            title_text,
+            (title_x, title_y)
+        )
 
+    def health(self, space_ship: SpaceShip, base: Base) -> None:
+        """
+        Displays the health count for both the ship and the base.
+        """
+        # Display ship health
+        for life in range(space_ship.get_lives()):
+            heart_x = Health.HEART_SPACING.value * (life+1) + Health.HEART_WIDTH.value * life
+            self.win.blit(
+                self.heart,
+                (heart_x, Health.Y.value)
+            )
+        # Display base health
+        for life in range(base.get_lives()):
+            castle_x = Health.CASTLE_SPACING.value * (life+1) + Health.HEIGHT.value * (life+1)
+            # the Health HEIGHT is also the castle's side
+            self.win.blit(
+                self.castle,
+                (Win.WIDTH.value - castle_x, Health.Y.value)
+            )
+    
+    def game_over(self) -> None:
+        """
+        Handles the game over screen. Renders the associated texts 
+        and displays them.
+        """
+        # Title info
+        game_over_text = pygame.font.Font(
+            Paths.FONT.value,
+            Text.TITLE_SIZE.value
+        ).render(Text.GAME_OVER_TEXT.value, 1, Colors.WHITE.value)
+        game_over_x = Win.WIDTH.value//2 - game_over_text.get_width()//2
+        game_over_y = int(Win.HEIGHT.value * Text.TITLE_HEIGHT.value)
+        # Caption 1 info
+        sub_text_1 = pygame.font.Font(
+            Paths.FONT.value,
+            Text.SUB_SIZE.value
+        ).render(Text.SUB_ONE_TEXT.value, 1, Colors.WHITE.value)
+        sub_x_1 = Win.WIDTH.value//2 - sub_text_1.get_width()//2
+        sub_y_1 = int(Win.HEIGHT.value * Text.SUB_HEIGHT_ONE.value)
+        # Caption 2 info
+        sub_text_2 = pygame.font.Font(
+            Paths.FONT.value,
+            Text.SUB_SIZE.value
+        ).render(Text.SUB_TWO_TEXT.value, 1, Colors.WHITE.value)
+        sub_x_2 = Win.WIDTH.value//2 - sub_text_2.get_width()//2
+        sub_y_2 = sub_y_1 + sub_text_1.get_height()
+        # Display on screen
+        self.win.blit(
+            game_over_text,
+            (game_over_x, game_over_y)
+        )
+        self.win.blit(
+            sub_text_1,
+            (sub_x_1, sub_y_1)
+        )
+        self.win.blit(
+            sub_text_2,
+            (sub_x_2, sub_y_2)
+        )
+        # Update
+        self.update()
 
+    def update_ship(self, ship: SpaceShip) -> None:
+        """
+        Updates the location of the ship. 
+        Makes the image blink if the ship has been hit.
+        """
+        if not ship.delaying(self.frame) or self.frame % 20 > 10:
+            self.win.blit(ship.get_image(), ship.get_rect())
 
-        
+    def update_invader(self, invader: SpaceInvader) -> None:
+        """
+        Updates the location of a single invader.
+        """
+        invader.move(self.frame)
+        self.win.blit(invader.get_image(), invader.get_rect())
+
+    def update_frame(self, fps: int = 0, interval: int = 1) -> None:
+        """
+        Makes the clock tick and keeps track of the current frame.
+        Default value for the fps variable is self.fps.
+        """
+        fps = self.fps if fps == 0 else fps
+        self.clock.tick(fps)
+        self.frame += interval
+
+    def update(self) -> None:
+        """
+        Updates the whole screen, necessary for each frame
+        """
+        pygame.display.update()
+
+    def get_frame(self):
+        return self.frame

@@ -46,6 +46,7 @@ class Game():
         )
         # Spawn the invaders!
         self.invaders = self.spawner.init_spawn()
+        self.bullets = []
         self.base = Base(lives=BASE_LIVES)
     
     def run(self) -> bool:
@@ -69,19 +70,31 @@ class Game():
                 return self.game_over()
             # Tick clock, update frame count
             self.screen.update_frame()
+            self.screen.scroll()
             # Spawn new invaders
             self.invaders.extend(
                 self.spawner.later_spawn(self.screen.get_frame())
             )
+            # Update existing bullets 
+            for bullet in self.bullets:
+                bullet.travel()
+                self.screen.update_bullet(bullet)
             # Register pressed keys (left or right)
             keys_pressed = pygame.key.get_pressed()
             self.space_ship.move(keys_pressed)
+            self.bullets.extend(self.space_ship.shoot(keys_pressed))
             # Update background
             self.screen.scroll()
             # Display title
             # if frame < Win.FPS.value*10:
             #     screen.title_fade(frame)
+            # Ship
             self.screen.update_ship(self.space_ship)
+            # Bullets
+            for bullet in self.bullets:
+                bullet.travel()
+
+            # Invaders
             for invader in self.invaders:
                 # Update location
                 self.screen.update_invader(invader)

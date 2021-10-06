@@ -21,6 +21,7 @@ Enum buckets are:
 Lastly, the Base object only has one attribute, hence it has
 a constant variable instead of an enum object.
 """
+
 import os
 from enum import Enum
 
@@ -44,6 +45,7 @@ class Paths(Enum):
 class Colors(Enum):
     WHITE = (255, 255, 255)
     # PURPLE = (64, 0, 64)
+    ORANGE = (255, 165, 0)
     BLACK = (0, 0, 0)
 
 class Win(Enum):
@@ -76,7 +78,8 @@ class Ship(Enum):
     INITY = 460
     WIDTH = 50
     HEIGHT = 50
-    DELAY = 1 # in seconds
+    DELAYHIT = 1 # in seconds
+    DELAYSHOOT = 0.2 
 
 class Invader(Enum):
     VEL = 2 # velocity
@@ -91,5 +94,11 @@ class Spawning(Enum):
     LATER = 2
     INTERVAL = 2 # new wave every 2 seconds
     INCREMENT = 4 # extra invader every 10 seconds
+
+class Bulletenum(Enum):
+    VEL = 6
+    WIDTH = 6
+    HEIGHT = 15
+    CUTTOFF = -15 # The height, but negative
 
 BASE_LIVES = 3

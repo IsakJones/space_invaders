@@ -6,11 +6,13 @@ Only has an attribute with the number of lives, but adds a
 method returning true if a spaceinvader makes it past the ship.
 It's lives are represented in the game with the castle icons.
 """
+
 from enums import Win
 from abstract import Thing
 from space_invader import SpaceInvader
 
 class Base(Thing):
+
     def __init__(self, lives: int):
         super().__init__(lives)
 

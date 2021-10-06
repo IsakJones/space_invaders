@@ -16,11 +16,13 @@ and the last_hit attribute, which stores the last frame when the ship was hit.
 import pygame
 import os
 
+from bullet import Bullet
 from abstract import Creature
-from enums import Win, Ship, Invader
+from enums import Win, Bulletenum, Colors 
 from space_invader import SpaceInvader
 
 class SpaceShip(Creature):
+
     def __init__(
         self,
         vel: int,
@@ -29,12 +31,15 @@ class SpaceShip(Creature):
         init_y: int, 
         width: int,
         height: int,
-        delay: int, # in seconds
+        delay_hit: int, # in seconds
+        delay_shoot: int,
         path: os.path
     ):
         super().__init__(vel, lives, init_x, init_y, width, height, path)
-        self.delay = delay * Win.FPS.value 
+        self.delay_hit = delay_hit * Win.FPS.value 
+        self.delay_shoot = delay_shoot * Win.FPS.value
         self.last_hit = -100 # So that it does not register as delaying at the beginning
+        self.last_shoot = -100 # Same logic
 
     def move(self, keys_pressed: dict) -> None:
         """
@@ -52,13 +57,34 @@ class SpaceShip(Creature):
         Returns true if invader and ship collide.
         """
         if self.rect.colliderect(invader.rect):
-            if not self.delaying(frame):
+            if not self.delaying_hit(frame):
                 self.last_hit = frame
                 return True
         return False
 
-    def delaying(self, frame: int) -> bool:
+    def delaying_hit(self, frame: int) -> bool:
         """
         Returns true if the ship was last hit within the delay time
         """
-        return frame-self.last_hit < self.delay
+        return frame-self.last_hit < self.delay_hit
+    
+    def delaying_shoot(self, frame: int) -> bool:
+        """
+        Returns true if the ship last shot within the delay time
+        """
+        return frame-self.last_shoot < self.delay_shoot
+
+    def shoot(self, frame: int, keys_pressed) -> list:
+        """
+        Shoots a bullet, maybe implement a delay later.
+        Returns a list with bullet is space is pressed, empty list otherwise.
+        """
+        if keys_pressed[pygame.K_SPACE] and not self.delaying_shoot(frame):
+            self.last_shoot = frame # update frame
+            return [
+                Bullet(
+                    init_x=self.rect.x + (self.width - Bulletenum.WIDTH.value)/2,
+                    init_y=self.rect.y,
+                )
+            ]
+        return []

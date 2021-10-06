@@ -14,12 +14,13 @@ import pygame
 import os
 
 from base import Base
-from space_ship import SpaceShip
+from space_ship import Bullet, SpaceShip
 from enums import Paths, Colors, Text, Win, Health
 from space_invader import SpaceInvader
 
 
 class Background(): 
+
     def __init__(self, path: os.path): 
         self.image = pygame.image.load(path)
         self.height = self.image.get_height() 
@@ -184,7 +185,7 @@ class Window():
         Updates the location of the ship. 
         Makes the image blink if the ship has been hit.
         """
-        if not ship.delaying(self.frame) or self.frame % 20 > 10:
+        if not ship.delaying_hit(self.frame) or self.frame % 20 > 10:
             self.win.blit(ship.get_image(), ship.get_rect())
 
     def update_invader(self, invader: SpaceInvader) -> None:
@@ -202,6 +203,20 @@ class Window():
         fps = self.fps if fps == 0 else fps
         self.clock.tick(fps)
         self.frame += interval
+
+    def update_bullet(self, bullet: Bullet) -> None:
+        """
+        Updates the bullet position based on its speed.
+        The function is called before new bullets are spawned so that
+        the newly spawned bullets' y position is the same as the spaceship's,
+        and not increased by vel.
+        Also, so that the ship's surface covers that of any bullets coming out
+        of it.
+        """
+        self.win.blit(
+            bullet.get_image(),
+            bullet.get_rect()
+        )
 
     def update(self) -> None:
         """

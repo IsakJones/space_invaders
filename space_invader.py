@@ -5,19 +5,22 @@ Object reppresenting the terrifying space invaders!
 Just like creature, but with custom motion that 
 constantly points downwards with randomized swerving.
 """
+
 import random
 import os
 
 from enums import Win
+from bullet import Bullet
 from abstract import Creature
 
 class SpaceInvader(Creature):
+
     def __init__(
         self,
         vel: int,
         lives: int,
-        init_x: int, 
-        init_y: int, 
+        init_x:  int,
+        init_y:  int,
         width: int,
         height: int,
         path: os.path
@@ -27,7 +30,7 @@ class SpaceInvader(Creature):
         self.right = random.choice([True, False]) 
         # the swerve direction switches every 1 to 2 seconds
         self.switch_time = int(Win.FPS.value * (1 + random.uniform(0, 1)))
-        
+
     def move(self, frame: int) -> None:
         """
         Method called in each frame updating the location of the invader.
@@ -47,4 +50,10 @@ class SpaceInvader(Creature):
             self.rect.x += self.vel # RIGHT
         else:
             self.rect.x -= self.vel # LEFT
-        self.rect.y += self.vel - 1 # DOWN
+        self.rect.y += self.vel - 1 # DOW
+
+    def is_hit(self, bullet: Bullet) -> bool:
+        """
+        Returns true if the bullet has hit the invader.
+        """
+        return self.rect.colliderect(bullet.rect)

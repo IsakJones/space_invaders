@@ -10,16 +10,19 @@ screen.
 All attributes' initializing variables are pulled from their respective enum.
 Changing initializing variables for the sake of testing should be done in the enums file.
 """
+
 import pygame
 import os
 
 from base import Base
 from window import Window
+from bullet import Bullet
 from spawner import Spawner
 from space_ship import SpaceShip
-from enums import Win, Paths, Ship, Spawning, BASE_LIVES
+from enums import Bulletenum, Win, Paths, Ship, Spawning, BASE_LIVES
 
 class Game():
+
     def __init__(self):
         self.screen = Window(
             fps=Win.FPS.value,
@@ -35,7 +38,8 @@ class Game():
             init_y=Ship.INITY.value,
             width=Ship.WIDTH.value,
             height=Ship.HEIGHT.value,
-            delay=Ship.DELAY.value,
+            delay_hit=Ship.DELAYHIT.value,
+            delay_shoot=Ship.DELAYSHOOT.value,
             path=Paths.SHIP.value
         )
         self.spawner = Spawner(
@@ -48,7 +52,7 @@ class Game():
         self.invaders = self.spawner.init_spawn()
         self.bullets = []
         self.base = Base(lives=BASE_LIVES)
-    
+
     def run(self) -> bool:
         """
         The main game app. Returns true if the game should restart.
@@ -64,35 +68,48 @@ class Game():
                 if event.type == pygame.QUIT:
                     run = False
                     break
-
-            # Check for game over
+             
+            # check for game over
             if self.space_ship.is_destroyed() or self.base.is_destroyed():
                 return self.game_over()
-            # Tick clock, update frame count
+            # tick clock, update frame count
             self.screen.update_frame()
             self.screen.scroll()
-            # Spawn new invaders
-            self.invaders.extend(
-                self.spawner.later_spawn(self.screen.get_frame())
-            )
-            # Update existing bullets 
-            for bullet in self.bullets:
-                bullet.travel()
-                self.screen.update_bullet(bullet)
-            # Register pressed keys (left or right)
-            keys_pressed = pygame.key.get_pressed()
-            self.space_ship.move(keys_pressed)
-            self.bullets.extend(self.space_ship.shoot(keys_pressed))
+            # spawn new invaders
+            # self.invaders.extend(
+            #     self.spawner.later_spawn(self.screen.get_frame())
+            # )
+            # # check if a bullet has hit an invader
+            # bullets_to_remove = set()
+            # invaders_to_remove = set()
+            
+            # for bullet in self.bullets:
+            #     # check if bullets out of the screen
+            #     if bullet.out_of_bounds():
+            #         bullets_to_remove.add(bullet)
+            #     for invader in self.invaders:
+            #         if invader.is_hit(bullet):
+            #             invaders_to_remove.add(invader)
+            #             bullets_to_remove.add(bullet)
+            # # remove invaders  
+            # for invader in invaders_to_remove:
+            #     self.invaders.remove(invader)
+            # # remove bullets
+            # for bullet in bullets_to_remove:
+            #     self.bullets.remove(bullet)
+
+            # # register pressed keys (left or right)
+            # keys_pressed = pygame.key.get_pressed()
+            # self.space_ship.move(keys_pressed)
+            # self.bullets.extend(self.space_ship.shoot(self.screen.get_frame(), keys_pressed))
             # Update background
             self.screen.scroll()
-            # Display title
-            # if frame < Win.FPS.value*10:
-            #     screen.title_fade(frame)
             # Ship
             self.screen.update_ship(self.space_ship)
             # Bullets
             for bullet in self.bullets:
                 bullet.travel()
+                self.screen.update_bullet(bullet)
 
             # Invaders
             for invader in self.invaders:
@@ -136,7 +153,7 @@ class Game():
             # Update screen
             self.screen.game_over()
             self.screen.update_frame(fps=15)
-    
+
     def play_music(self, path: os.path="/", times: int=-1):
         """
         Plays music at path {times} times. Default is "soundtrack.mp3".
@@ -151,6 +168,3 @@ class Game():
         Stops the music.
         """
         pygame.mixer.music.stop()
-
-
-    

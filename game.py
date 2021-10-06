@@ -76,32 +76,32 @@ class Game():
             self.screen.update_frame()
             self.screen.scroll()
             # spawn new invaders
-            # self.invaders.extend(
-            #     self.spawner.later_spawn(self.screen.get_frame())
-            # )
-            # # check if a bullet has hit an invader
-            # bullets_to_remove = set()
-            # invaders_to_remove = set()
+            self.invaders.extend(
+                self.spawner.later_spawn(self.screen.get_frame())
+            )
+            # check if a bullet has hit an invader
+            bullets_to_remove = set()
+            invaders_to_remove = set()
             
-            # for bullet in self.bullets:
-            #     # check if bullets out of the screen
-            #     if bullet.out_of_bounds():
-            #         bullets_to_remove.add(bullet)
-            #     for invader in self.invaders:
-            #         if invader.is_hit(bullet):
-            #             invaders_to_remove.add(invader)
-            #             bullets_to_remove.add(bullet)
-            # # remove invaders  
-            # for invader in invaders_to_remove:
-            #     self.invaders.remove(invader)
-            # # remove bullets
-            # for bullet in bullets_to_remove:
-            #     self.bullets.remove(bullet)
+            for bullet in self.bullets:
+                # check if bullets out of the screen
+                if bullet.out_of_bounds():
+                    bullets_to_remove.add(bullet)
+                for invader in self.invaders:
+                    if invader.is_hit(bullet):
+                        invaders_to_remove.add(invader)
+                        bullets_to_remove.add(bullet)
+            # remove invaders  
+            for invader in invaders_to_remove:
+                self.invaders.remove(invader)
+            # remove bullets
+            for bullet in bullets_to_remove:
+                self.bullets.remove(bullet)
 
-            # # register pressed keys (left or right)
-            # keys_pressed = pygame.key.get_pressed()
-            # self.space_ship.move(keys_pressed)
-            # self.bullets.extend(self.space_ship.shoot(self.screen.get_frame(), keys_pressed))
+            # register pressed keys (left or right)
+            keys_pressed = pygame.key.get_pressed()
+            self.space_ship.move(keys_pressed)
+            self.bullets.extend(self.space_ship.shoot(self.screen.get_frame(), keys_pressed))
             # Update background
             self.screen.scroll()
             # Ship

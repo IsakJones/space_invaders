@@ -12,6 +12,7 @@ of invaders in the initial wave is different than the number of invaders in succ
 waves. In later waves, the number of invaders only increases, and it doesn't decrease at
 any point. 
 """
+
 import random
 
 from enums import Win, Paths, Invader
@@ -36,8 +37,8 @@ class Spawner():
        spawns a set number of invaders.
      - later_spawn is called later at a fixed interval, spawning an
        increasing number of invaders, again at set value
-    
     """
+
     def __init__(
         self, 
         initial_invaders: int, 

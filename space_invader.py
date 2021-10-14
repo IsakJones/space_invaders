@@ -33,7 +33,7 @@ class SpaceInvader(Creature):
 
     def move(self, frame: int) -> None:
         """
-        Method called in each frame updating the location of the invader.
+        method called in each frame updating the location of the invader.
         The invader always moves downward, and switches left / right direction
         according to self.switch_time, and also whether it bumps against one of
         the walls. Condition left and right are true if it bumps against either.

@@ -11,6 +11,7 @@ dictates the game's pace, and includes an attribute tracking the frame number, w
 important for many methods. The background, hearts, and castles are also attributes.
 """
 import pygame
+import asyncio
 import os
 
 from base import Base
@@ -34,10 +35,11 @@ class Background():
         # The background is displayed lower by num, higher if num<0
         return (self.rect.left, self.rect.top-num)
     
-    def rotate(self) -> None:
+    async def rotate(self) -> None:
         # rotate self.image and self.rotated by 270 degrees
+
         self.image = self.rotated
-        self.rotated = pygame.transform.rotate(self.image, self.rotation)
+        self.rotated = await pygame.transform.rotate(self.image, self.rotation)
 
     
 class Window():

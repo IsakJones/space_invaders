@@ -37,9 +37,10 @@ class SpaceShip(Creature):
     ):
         super().__init__(vel, lives, init_x, init_y, width, height, path)
         self.delay_hit = delay_hit * Win.FPS.value 
-        self.delay_shoot = delay_shoot * Win.FPS.value
+        # self.delay_shoot = delay_shoot * Win.FPS.value
         self.last_hit = -100 # So that it does not register as delaying at the beginning
-        self.last_shoot = -100 # Same logic
+        # self.last_shoot = -100 # Same logic
+        self.ready_to_shoot = True
 
     def move(self, keys_pressed: dict) -> None:
         """
@@ -68,23 +69,25 @@ class SpaceShip(Creature):
         """
         return frame-self.last_hit < self.delay_hit
     
-    def delaying_shoot(self, frame: int) -> bool:
-        """
-        Returns true if the ship last shot within the delay time
-        """
-        return frame-self.last_shoot < self.delay_shoot
+    # def delaying_shoot(self, frame: int) -> bool:
+    #     """
+    #     Returns true if the ship last shot within the delay time
+    #     """
+    #     return frame-self.last_shoot < self.delay_shoot
 
     def shoot(self, frame: int, keys_pressed) -> list:
         """
         Shoots a bullet, maybe implement a delay later.
         Returns a list with bullet is space is pressed, empty list otherwise.
         """
-        if keys_pressed[pygame.K_SPACE] and not self.delaying_shoot(frame):
-            self.last_shoot = frame # update frame
+        if keys_pressed[pygame.K_SPACE] and self.ready_to_shoot:
+            self.ready_to_shoot = False
             return [
                 Bullet(
                     init_x=self.rect.x + (self.width - Bulletenum.WIDTH.value)/2,
                     init_y=self.rect.y,
                 )
             ]
+        elif not keys_pressed[pygame.K_SPACE]:
+            self.ready_to_shoot = True
         return []

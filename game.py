@@ -69,9 +69,9 @@ class Game():
                     run = False
                     break
              
-            # check for game over
-            if self.space_ship.is_destroyed() or self.base.is_destroyed():
-                return self.game_over()
+            # # check for game over
+            # if self.space_ship.is_destroyed() or self.base.is_destroyed():
+            #     return self.game_over()
             # tick clock, update frame count
             self.screen.update_frame()
             self.screen.scroll()

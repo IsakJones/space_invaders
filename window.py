@@ -26,21 +26,11 @@ class Background():
         self.image = pygame.image.load(path)
         self.height = self.image.get_height() 
         self.rect = self.image.get_rect()
-        # self.rect.left, self.rect.top = (0, 0)
-        # The next attributes  are necessary for rotation
-        self.rotation = 270
-        self.rotated = pygame.transform.rotate(self.image, self.rotation)
 
     def rect_desc(self, num: int) -> tuple:
         # The background is displayed lower by num, higher if num<0
         return (self.rect.left, self.rect.top-num)
     
-    async def rotate(self) -> None:
-        # rotate self.image and self.rotated by 270 degrees
-
-        self.image = self.rotated
-        self.rotated = await pygame.transform.rotate(self.image, self.rotation)
-
     
 class Window():
     def __init__(
@@ -58,10 +48,6 @@ class Window():
         self.background = Background(background)
         self.font  = font
         self.clock = pygame.time.Clock()
-        # self.title = pygame.transform.scale(
-        #     pygame.image.load(title),
-        #     (Title.WIDTH.value, Title.HEIGHT.value)
-        # )#.convert_alpha()
         self.frame = 0 # The current nth frame.
         self.heart = pygame.transform.scale(
             pygame.image.load(
@@ -84,20 +70,15 @@ class Window():
         lower limit has risen above the window's lower side) the same image
         rises below it, rotated by 270 degrees.
         """
-        # Adds background image and infinite scrolling
         frame = self.frame % self.background.height
-        # If the old background has been completely scrolled over, 
-        # make the old background the new background
-        if frame == 0:
-            self.background.rotate()
-        # Display the old background
+        # Represent the background shifted down according to frame
         self.win.blit(self.background.image, self.background.rect_desc(frame))
-        # If the old background's lower limit has risen above the
-        # window's lowest side, make a rotated background rise below it
+        # Blit a second background underneath the current one if the
+        # current one's lower border has shifted above the visible screen
         if frame > self.background.height-self.height:
             offset = frame - self.background.height
             self.win.blit(
-                self.background.rotated,
+                self.background.image,
                 self.background.rect_desc(offset)
             )
 

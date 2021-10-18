@@ -63,18 +63,6 @@ class SpaceShip(Creature):
                 return True
         return False
 
-    def delaying_hit(self, frame: int) -> bool:
-        """
-        Returns true if the ship was last hit within the delay time
-        """
-        return frame-self.last_hit < self.delay_hit
-    
-    # def delaying_shoot(self, frame: int) -> bool:
-    #     """
-    #     Returns true if the ship last shot within the delay time
-    #     """
-    #     return frame-self.last_shoot < self.delay_shoot
-
     def shoot(self, frame: int, keys_pressed) -> list:
         """
         Shoots a bullet, maybe implement a delay later.

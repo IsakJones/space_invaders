@@ -7,5 +7,8 @@ class Player():
     def get_name(self) -> str:
         return self.name
 
+    def killed_invader(self) -> None:
+        self.add_to_score(50)
+
     def add_to_score(self, adder: int) -> None:
         self.score += adder

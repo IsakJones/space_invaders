@@ -33,8 +33,10 @@ CREATE TABLE scores(
 );
 """) 
 
-# Commit changes and close the cursor
+# Commit changes 
 connection.commit()
+
+# Close cursor
 cursor.close()
 
 # Close connection

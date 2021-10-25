@@ -24,6 +24,9 @@ from enums import Bulletenum, Win, Paths, Ship, Spawning, BASE_LIVES
 class Game():
 
     def __init__(self):
+        pygame.init()
+        pygame.mixer.init()
+
         self.screen = Window(
             fps=Win.FPS.value,
             font=Paths.FONT.value,
@@ -39,8 +42,10 @@ class Game():
             width=Ship.WIDTH.value,
             height=Ship.HEIGHT.value,
             delay_hit=Ship.DELAYHIT.value,
-            delay_shoot=Ship.DELAYSHOOT.value,
-            path=Paths.SHIP.value
+            path=Paths.SHIP.value,
+            sound=pygame.mixer.Sound(
+                Paths.LASER.value
+            )
         )
         self.spawner = Spawner(
             initial_invaders=Spawning.INIT.value,
@@ -57,7 +62,6 @@ class Game():
         """
         The main game app. Returns true if the game should restart.
         """
-        pygame.init()
         # Play music
         self.play_music()
         # Run the game
@@ -159,7 +163,6 @@ class Game():
         Plays music at path {times} times. Default is "soundtrack.mp3".
         """
         path = Paths.MUSIC.value if path == "/" else path
-        pygame.mixer.init()
         pygame.mixer.music.load(path)
         pygame.mixer.music.play(times) # -1 is infinite loop
 

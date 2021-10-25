@@ -1,6 +1,5 @@
 import psycopg2 as pg
 
-
 # Open the connection with the db
 connection = pg.connect(
     host="localhost",

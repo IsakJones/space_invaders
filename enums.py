@@ -28,12 +28,13 @@ from enum import Enum
 class Paths(Enum):
     BACKGROUND = os.path.join("Assets", "background.png")
     GAME_OVER = os.path.join("Assets", "game_over.mp3")
+    CASTLE = os.path.join("Assets", "castle_grey.png")
     MUSIC = os.path.join("Assets", "soundtrack.mp3")
     SHIP = os.path.join("Assets", "space_ship.png")
-    CASTLE = os.path.join("Assets", "castle_grey.png")
     FONT = os.path.join("Assets", "arcade.TTF")
     HEART = os.path.join("Assets", "heart.png")
     TITLE = os.path.join("Assets", "title.png")
+    LASER = os.path.join("Assets", "laser.mp3")
     INVADER = [
         os.path.join("Assets", "blue_invader.png"),
         os.path.join("Assets", "green_invader.png"),
@@ -79,7 +80,6 @@ class Ship(Enum):
     WIDTH = 50
     HEIGHT = 50
     DELAYHIT = 1 # in seconds
-    DELAYSHOOT = 0.2 
 
 class Invader(Enum):
     VEL = 2 # velocity

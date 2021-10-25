@@ -18,7 +18,7 @@ import os
 
 from bullet import Bullet
 from abstract import Creature
-from enums import Win, Bulletenum, Colors 
+from enums import Win, Bulletenum, Paths
 from space_invader import SpaceInvader
 
 class SpaceShip(Creature):
@@ -31,16 +31,12 @@ class SpaceShip(Creature):
         init_y: int, 
         width: int,
         height: int,
-        delay_hit: int, # in seconds
-        delay_shoot: int,
-        path: os.path
+        path: os.path,
+        sound: pygame.mixer.Sound
     ):
         super().__init__(vel, lives, init_x, init_y, width, height, path)
-        self.delay_hit = delay_hit * Win.FPS.value 
-        # self.delay_shoot = delay_shoot * Win.FPS.value
-        self.last_hit = -100 # So that it does not register as delaying at the beginning
-        # self.last_shoot = -100 # Same logic
         self.ready_to_shoot = True
+        self.laser_sound = sound
 
     def move(self, keys_pressed: dict) -> None:
         """
@@ -69,7 +65,8 @@ class SpaceShip(Creature):
         Returns a list with bullet is space is pressed, empty list otherwise.
         """
         if keys_pressed[pygame.K_SPACE] and self.ready_to_shoot:
-            self.ready_to_shoot = False
+            self.ready_to_shoot = False # So the player has to press the space bar again
+            self.laser_sound.play() # The laser beam sound
             return [
                 Bullet(
                     init_x=self.rect.x + (self.width - Bulletenum.WIDTH.value)/2,

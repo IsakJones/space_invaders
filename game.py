@@ -74,8 +74,8 @@ class Game():
                     break
              
             # # check for game over
-            # if self.space_ship.is_destroyed() or self.base.is_destroyed():
-            #     return self.game_over()
+            if self.space_ship.is_destroyed() or self.base.is_destroyed():
+                return self.game_over()
             # tick clock, update frame count
             self.screen.update_frame()
             self.screen.scroll()
@@ -105,7 +105,7 @@ class Game():
             # register pressed keys (left or right)
             keys_pressed = pygame.key.get_pressed()
             self.space_ship.move(keys_pressed)
-            self.bullets.extend(self.space_ship.shoot(self.screen.get_frame(), keys_pressed))
+            self.bullets.extend(self.space_ship.shoot(keys_pressed))
             # Update background
             self.screen.scroll()
             # Ship

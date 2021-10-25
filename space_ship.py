@@ -32,11 +32,16 @@ class SpaceShip(Creature):
         width: int,
         height: int,
         path: os.path,
+        delay_hit: int,
         sound: pygame.mixer.Sound
     ):
         super().__init__(vel, lives, init_x, init_y, width, height, path)
         self.ready_to_shoot = True
         self.laser_sound = sound
+        self.laser_sound.set_volume(0.19) # Just made sense as a level of volume (0->1.0)
+        print(self.laser_sound.get_volume())
+        self.delay_hit = delay_hit * Win.FPS.value
+        self.last_hit = - Win.FPS.value # So that the ship's not delaying when the game starts
 
     def move(self, keys_pressed: dict) -> None:
         """
@@ -49,6 +54,12 @@ class SpaceShip(Creature):
         if keys_pressed[pygame.K_RIGHT] and condition: # RIGHT
             self.rect.x += self.vel
 
+    def delaying_hit(self, frame: int) -> bool:
+        """
+        Returns true if the ship was last hit within the delay time
+        """
+        return frame-self.last_hit < self.delay_hit
+
     def is_hit(self, frame: int, invader: SpaceInvader) -> bool:
         """
         Returns true if invader and ship collide.
@@ -59,7 +70,7 @@ class SpaceShip(Creature):
                 return True
         return False
 
-    def shoot(self, frame: int, keys_pressed) -> list:
+    def shoot(self, keys_pressed) -> list:
         """
         Shoots a bullet, maybe implement a delay later.
         Returns a list with bullet is space is pressed, empty list otherwise.

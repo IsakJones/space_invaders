@@ -6,7 +6,7 @@ The restart is iterative as opposed to recursive (i.e. if the player chooses to
 restart, main is not called within main) to avoid a stack overflow upon successive
 restarts.
 """ 
-from game import Game
+from src.game import Game
 
 def main(status=True):
     """

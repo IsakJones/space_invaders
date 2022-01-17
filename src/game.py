@@ -85,14 +85,17 @@ class Game():
             self.invaders.extend(
                 self.spawner.later_spawn(self.screen.get_frame())
             )
+
+            # check if any bullets are out of bounds
+            # works because bullets are naturally sorted from highest to lowest
+            while self.bullets and self.bullets[0].out_of_bounds():
+                self.bullets = self.bullets[1:]
+
             # check if a bullet has hit an invader
-            bullets_to_remove = set()
             invaders_to_remove = set()
+            bullets_to_remove = set()
             
             for bullet in self.bullets:
-                # check if bullets out of the screen
-                if bullet.out_of_bounds():
-                    bullets_to_remove.add(bullet)
                 for invader in self.invaders:
                     if invader.is_hit(bullet):
                         invaders_to_remove.add(invader)
@@ -104,14 +107,12 @@ class Game():
             for bullet in bullets_to_remove:
                 self.bullets.remove(bullet)
 
-            # register pressed keys (left or right)
+            # register pressed keys (left, right, and spacebar)
             keys_pressed = pygame.key.get_pressed()
             self.space_ship.move(keys_pressed)
             self.bullets.extend(self.space_ship.shoot(keys_pressed))
             # Update background
             self.screen.scroll()
-            # Ship
-            self.screen.update_ship(self.space_ship)
             # Bullets
             for bullet in self.bullets:
                 bullet.travel()
@@ -131,6 +132,10 @@ class Game():
                     self.space_ship.lose_life()
                     print(f"The ship still has {self.space_ship.get_lives()} lives.")
                     self.invaders.remove(invader)
+
+            # Ship
+            if not self.space_ship.is_destroyed():
+                self.screen.update_ship(self.space_ship)
             # Display health
             self.screen.health(self.space_ship, self.base)
             # If it's the start, display the title

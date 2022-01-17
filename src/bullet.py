@@ -37,6 +37,12 @@ class Bullet():
     def get_rect(self) -> tuple:
         return (self.rect.x, self.rect.y)
 
+    def get_y(self) -> int:
+        return self.rect.y
+    
+    def get_x(self) -> int:
+        return self.rect.x
+
     def get_image(self) -> pygame.Surface:
         return self.image
 

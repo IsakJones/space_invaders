@@ -16,13 +16,14 @@ After it is hit, the spaceship cannot be hit again according to the delay
 delay attribute, i.e. the amount in seconds that the ship should be immune,
 and the last_hit attribute, which stores the last frame when the ship was hit.
 """
+from pathlib import Path
 import pygame
 import os
 
 from .sound import Sound
-from .bullet import Bullet
+from .laser import Laser
 from .abstract import Creature
-from .constants import Win, Bulletenum, Paths
+from .constants import Win, Laserconst, Paths
 from .space_invader import SpaceInvader
 
 class SpaceShip(Creature):
@@ -44,12 +45,16 @@ class SpaceShip(Creature):
         self.delay_hit = delay_hit * Win.FPS.value
         self.last_hit = - Win.FPS.value # So that the ship's not delaying when the game starts
         self.sound = sound
+        self.laser_image = pygame.transform.scale(
+            pygame.image.load(Paths.LASER_IMAGE.value),
+            (Laserconst.WIDTH.value, Laserconst.HEIGHT.value)
+        )
 
     def move(self, keys_pressed: dict) -> None:
         """
         Updates the ship's location according to keys pressed.
         """
-        condition = self.rect.x < Win.WIDTH.value-self.width
+        condition = self.rect.x < Win.WIDTH.value-self.rect.width
 
         if keys_pressed[pygame.K_LEFT] and self.rect.x > 0: # LEFT
             self.rect.x -= self.vel
@@ -81,9 +86,10 @@ class SpaceShip(Creature):
             self.ready_to_shoot = False # So the player has to press the space bar again
             self.sound.play_laser()
             return [
-                Bullet(
-                    init_x=self.rect.x + (self.width - Bulletenum.WIDTH.value)/2,
+                Laser(
+                    init_x=self.rect.x + (self.rect.width - Laserconst.WIDTH.value)/2,
                     init_y=self.rect.y,
+                    image=self.laser_image
                 )
             ]
         elif not keys_pressed[pygame.K_SPACE]:

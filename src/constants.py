@@ -29,12 +29,13 @@ class Paths(Enum):
     BACKGROUND = os.path.join("assets", "background.png")
     SOUNDTRACK = os.path.join("assets", "soundtrack.wav")
     GAME_OVER = os.path.join("assets", "game_over.wav")
-    CASTLE = os.path.join("assets", "castle_grey.png")
+    EARTH = os.path.join("assets", "earth.png")
     SHIP = os.path.join("assets", "space_ship.png")
     FONT = os.path.join("assets", "arcade.TTF")
     HEART = os.path.join("assets", "heart.png")
     TITLE = os.path.join("assets", "title.png")
-    LASER = os.path.join("assets", "laser.wav")
+    LASER_IMAGE = os.path.join("assets", "laser.png")
+    LASER_SOUND = os.path.join("assets", "laser.wav")
     INVADER = [
         os.path.join("assets", "blue_invader.png"),
         os.path.join("assets", "green_invader.png"),
@@ -51,7 +52,7 @@ class Colors(Enum):
 class Win(Enum):
     FPS = 60
     WIDTH = 640 # = 256 * 2.5
-    HEIGHT = 560 # = 224 * 2.5
+    HEIGHT = 600 # = 224 * 2.5 + 40 (padding height)
 
 class Text(Enum):
     TITLE_TEXT = "Space Invaders"
@@ -66,10 +67,13 @@ class Text(Enum):
 
 class Health(Enum):
     HEIGHT = 32 # 105 / 3, also the side of the square castle
-    HEART_WIDTH = 40 # 130 / 3
-    HEART_SPACING = 6
-    CASTLE_SPACING = 14 # = 40 + 6 - 32
+    WIDTH = 40 # 130 / 3
+    SPACING = 6
     Y = 6 
+
+class Score(Enum):
+    SIZE = 40
+    PADDING = 6
 
 class Ship(Enum):
     VEL = 5 # velocity
@@ -94,10 +98,10 @@ class Spawning(Enum):
     INTERVAL = 2 # new wave every 2 seconds
     INCREMENT = 4 # extra invader every 10 seconds
 
-class Bulletenum(Enum):
+class Laserconst(Enum):
     VEL = 6
     WIDTH = 6
-    HEIGHT = 15
+    HEIGHT = 30
     CUTTOFF = -15 # The height, but negative
 
 BASE_LIVES = 3

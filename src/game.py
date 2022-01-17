@@ -19,7 +19,7 @@ from .sound import Sound
 from .window import Window
 from .spawner import Spawner
 from .space_ship import SpaceShip
-from .constants import Bulletenum, Win, Paths, Ship, Spawning, BASE_LIVES
+from .constants import Win, Paths, Ship, Spawning, BASE_LIVES
 
 class Game():
 
@@ -29,7 +29,7 @@ class Game():
         self.sound = Sound(
             soundtrack=Paths.SOUNDTRACK.value,
             game_over=Paths.GAME_OVER.value,
-            laser=Paths.LASER.value
+            laser=Paths.LASER_SOUND.value
         )
         self.screen = Window(
             fps=Win.FPS.value,
@@ -57,8 +57,9 @@ class Game():
         )
         # Spawn the invaders!
         self.invaders = self.spawner.init_spawn()
-        self.bullets = []
+        self.lasers = []
         self.base = Base(lives=BASE_LIVES)
+        self.score = 0
 
     def run(self) -> bool:
         """
@@ -86,37 +87,38 @@ class Game():
                 self.spawner.later_spawn(self.screen.get_frame())
             )
 
-            # check if any bullets are out of bounds
-            # works because bullets are naturally sorted from highest to lowest
-            while self.bullets and self.bullets[0].out_of_bounds():
-                self.bullets = self.bullets[1:]
+            # check if any lasers are out of bounds
+            # works because lasers are naturally sorted from highest to lowest
+            while self.lasers and self.lasers[0].out_of_bounds():
+                self.lasers = self.lasers[1:]
 
-            # check if a bullet has hit an invader
+            # check if a laserjhas hit an invader
             invaders_to_remove = set()
-            bullets_to_remove = set()
+            lasers_to_remove = set()
             
-            for bullet in self.bullets:
+            for laser in self.lasers:
                 for invader in self.invaders:
-                    if invader.is_hit(bullet):
+                    if invader.is_hit(laser):
+                        self.score += 100
                         invaders_to_remove.add(invader)
-                        bullets_to_remove.add(bullet)
+                        lasers_to_remove.add(laser)
             # remove invaders  
             for invader in invaders_to_remove:
                 self.invaders.remove(invader)
-            # remove bullets
-            for bullet in bullets_to_remove:
-                self.bullets.remove(bullet)
+            # remove lasers
+            for laser in lasers_to_remove:
+                self.lasers.remove(laser)
 
             # register pressed keys (left, right, and spacebar)
             keys_pressed = pygame.key.get_pressed()
             self.space_ship.move(keys_pressed)
-            self.bullets.extend(self.space_ship.shoot(keys_pressed))
+            self.lasers.extend(self.space_ship.shoot(keys_pressed))
             # Update background
             self.screen.scroll()
-            # Bullets
-            for bullet in self.bullets:
-                bullet.travel()
-                self.screen.update_bullet(bullet)
+            # Lasers
+            for laser in self.lasers:
+                laser.travel()
+                self.screen.update_laser(laser)
 
             # Invaders
             for invader in self.invaders:
@@ -125,19 +127,20 @@ class Game():
                 # Check if it's reached the base
                 if self.base.is_hit(invader):
                     self.base.lose_life()
-                    print("An invader has reached your base!")
+                    # print("An invader has reached your base!")
                     self.invaders.remove(invader)
                 # Check if it's run against the ship
                 if self.space_ship.is_hit(self.screen.get_frame(), invader):
                     self.space_ship.lose_life()
-                    print(f"The ship still has {self.space_ship.get_lives()} lives.")
+                    # print(f"The ship still has {self.space_ship.get_lives()} lives.")
                     self.invaders.remove(invader)
 
             # Ship
             if not self.space_ship.is_destroyed():
                 self.screen.update_ship(self.space_ship)
-            # Display health
+            # Display health and score
             self.screen.health(self.space_ship, self.base)
+            self.screen.score(self.score)
             # If it's the start, display the title
             self.screen.title()
             # Update the screen

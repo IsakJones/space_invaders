@@ -8,14 +8,15 @@ In fact, only the Window object calls it, hence I've included them in the same f
 
 The Window object handles all surfaces on display. It also handles the clock, which 
 dictates the game's pace, and includes an attribute tracking the frame number, which is
-important for many methods. The background, hearts, and castles are also attributes.
+important for many methods. The background, hearts, and earth icons are also attributes.
 """
 import pygame
 import os
 
 from .base import Base
-from .space_ship import Bullet, SpaceShip
-from .constants import Paths, Colors, Text, Win, Health
+from .laser import Laser
+from .space_ship import SpaceShip
+from .constants import Paths, Colors, Text, Win, Health, Score
 from .space_invader import SpaceInvader
 
 
@@ -48,16 +49,16 @@ class Window():
         self.font  = font
         self.clock = pygame.time.Clock()
         self.frame = 0 # The current nth frame.
-        self.heart = pygame.transform.scale(
-            pygame.image.load(
-                Paths.HEART.value
-            ),
-            (Health.HEART_WIDTH.value, Health.HEIGHT.value)
+        self.score_font = pygame.font.Font(
+            Paths.FONT.value,
+            Score.SIZE.value
         )
-        self.castle = pygame.transform.scale(
-            pygame.image.load(
-                Paths.CASTLE.value
-            ),
+        self.heart = pygame.transform.scale(
+            pygame.image.load(Paths.HEART.value),
+            (Health.WIDTH.value, Health.HEIGHT.value)
+        )
+        self.earth = pygame.transform.scale(
+            pygame.image.load(Paths.EARTH.value),
             (Health.HEIGHT.value, Health.HEIGHT.value)
         )
         pygame.display.set_caption("Space Invaders!")
@@ -65,9 +66,6 @@ class Window():
     def scroll(self) -> None:
         """
         Adds backgorund image and infinite scrolling.
-        Once the background is scrolled over (i.e. once the original image's 
-        lower limit has risen above the window's lower side) the same image
-        rises below it, rotated by 270 degrees.
         """
         frame = self.frame % self.background.height
         # Represent the background shifted down according to frame
@@ -106,20 +104,33 @@ class Window():
         """
         # Display ship health
         for life in range(space_ship.get_lives()):
-            heart_x = Health.HEART_SPACING.value * (life+1) + Health.HEART_WIDTH.value * life
+            heart_x = Health.SPACING.value * (life+1) + Health.WIDTH.value * life
             self.win.blit(
                 self.heart,
                 (heart_x, Health.Y.value)
             )
         # Display base health
         for life in range(base.get_lives()):
-            castle_x = Health.CASTLE_SPACING.value * (life+1) + Health.HEIGHT.value * (life+1)
-            # the Health HEIGHT is also the castle's side
+            earth_x = Health.SPACING.value * (life+1) + Health.HEIGHT.value * (life+1)
+            # the HEIGHT is also the earth's side
             self.win.blit(
-                self.castle,
-                (Win.WIDTH.value - castle_x, Health.Y.value)
+                self.earth,
+                (Win.WIDTH.value - earth_x, Health.Y.value)
             )
     
+    def score(self, score: int) -> None:
+        """
+        Displays score under the ship.
+        """
+        score_text = self.score_font.render(str(score), 1, Colors.WHITE.value)
+        score_x = Win.WIDTH.value//2 - score_text.get_width()//2 - Score.PADDING.value
+        score_y = Win.HEIGHT.value - score_text.get_height() - Score.PADDING.value
+        
+        self.win.blit(
+            score_text,
+            (score_x, score_y)
+        )
+
     def game_over(self) -> None:
         """
         Handles the game over screen. Renders the associated texts 
@@ -186,23 +197,20 @@ class Window():
         self.clock.tick(fps)
         self.frame += interval
 
-    def update_bullet(self, bullet: Bullet) -> None:
+    def update_laser(self, laser: Laser) -> None:
         """
-        Updates the bullet position based on its speed.
-        The function is called before new bullets are spawned so that
-        the newly spawned bullets' y position is the same as the spaceship's,
+        Updates the laser position based on its speed.
+        The function is called before new lasers are spawned so that
+        the newly spawned lasers' y position is the same as the spaceship's,
         and not increased by vel.
-        Also, so that the ship's surface covers that of any bullets coming out
+        Also, so that the ship's surface covers that of any lasers coming out
         of it.
         """
-        self.win.blit(
-            bullet.get_image(),
-            bullet.get_rect()
-        )
+        self.win.blit(laser.get_image(), laser.get_rect())
 
     def update(self) -> None:
         """
-        Updates the whole screen, necessary for each frame
+        Updates the whole screen, necessary for each frame.
         """
         pygame.display.update()
 

@@ -10,7 +10,7 @@ import random
 import os
 
 from .constants import Win
-from .bullet import Bullet
+from .laser import Laser
 from .abstract import Creature
 
 class SpaceInvader(Creature):
@@ -26,8 +26,8 @@ class SpaceInvader(Creature):
         path: os.path
     ):
         super().__init__(vel, lives, init_x, init_y, width, height, path)
-        # self.right is true if the invader swerves right, false if it swerves left
-        self.right = random.choice([True, False]) 
+        # self.direction is true if the invader swerves right, false if it swerves left
+        self.direction = random.choice([True, False]) 
         # the swerve direction switches every 1 to 2 seconds
         self.switch_time = int(Win.FPS.value * (1 + random.uniform(0, 1)))
 
@@ -39,21 +39,24 @@ class SpaceInvader(Creature):
         the walls. Condition left and right are true if it bumps against either.
         """
         frame = frame % self.switch_time
-        # self.vel-1, otherwise it might speed past the border 
-        condition_left = 0 <= self.rect.x <= self.vel-1
-        condition_right = 0 <= self.rect.x - Win.WIDTH.value + self.width <= self.vel-1
-        # If the invader is out of bounds, or one/two seconds have past
-        if frame == 0 or condition_left or condition_right:
-            self.right = not self.right # change direction
+        # If the invader is too far right, swerve left
+        if 0 <= self.rect.x - Win.WIDTH.value + self.rect.width <= self.vel-1:
+            self.direction = False
+        # If the invader is too far left, swerve right
+        if 0 <= self.rect.x <= self.vel-1:
+            self.direction = True
+        # Each switch time, change direction
+        elif frame == 0:
+            self.direction = not self.direction 
         # Move
-        if self.right:
+        if self.direction:
             self.rect.x += self.vel # RIGHT
         else:
             self.rect.x -= self.vel # LEFT
-        self.rect.y += self.vel - 1 # DOW
+        self.rect.y += self.vel - 1 # DOWN
 
-    def is_hit(self, bullet: Bullet) -> bool:
+    def is_hit(self, laser: Laser) -> bool:
         """
-        Returns true if the bullet has hit the invader.
+        Returns true if the laser has hit the invader.
         """
-        return self.rect.colliderect(bullet.rect)
+        return self.rect.colliderect(laser.rect)

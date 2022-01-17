@@ -46,8 +46,6 @@ class Creature(Thing):
     ): 
         super().__init__(lives)
         self.vel = vel
-        self.width = width
-        self.height = height
         self.image = pygame.transform.scale(
             pygame.image.load(path), 
             (width, height)

@@ -1,5 +1,5 @@
 
-![Screenshot](assets/screenshot.png)
+![Screenshot](./assets/screenshot.png)
 <h2 align="center"><i>Space Invaders!</i></h2>
 
 <p align="center">
@@ -20,7 +20,7 @@
 
 ### Intro
 
-This is my own take on the classic space invaders retro game! I originally wrote this program when applying to the Recurse Center, but I fleshed out the program because I enjoyed the challenge of writing a retro videogame. I'm quite satisfied of the final product, and I think that writing this game was overall a great learning experience.
+This is my own take on the classic space invaders retro game! I originally wrote this program when applying to the Recurse Center, but I fleshed out the program because I enjoyed the challenge of writing a retro videogame. I'm quite satisfied of the final product, and I think that this project was overall a great learning experience.
 
 ## Table of Contents
 - [Installation](#Installation)

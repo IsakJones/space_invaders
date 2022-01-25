@@ -1,0 +1,3 @@
+SQLAlchemy==1.4.29
+pygame==1.9.6
+pygame-textinput==1.0.1

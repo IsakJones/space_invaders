@@ -3,35 +3,22 @@ DOCSTRING
 
 This file includes all objects handling visual changes.
 
-The Background object is necessary for the custom scrolling, and only used for that.
-In fact, only the Window object calls it, hence I've included them in the same file.
-
 The Window object handles all surfaces on display. It also handles the clock, which 
 dictates the game's pace, and includes an attribute tracking the frame number, which is
 important for many methods. The background, hearts, and earth icons are also attributes.
 """
+from curses.ascii import SUB
+import pygame_textinput as pgti
 import pygame
 import os
 
 from .base import Base
 from .laser import Laser
 from .space_ship import SpaceShip
-from .constants import Paths, Colors, Text, Win, Health, Score
+from .constants import Paths, Colors, Titles, Win, Health, Score, Buttons, Table
 from .space_invader import SpaceInvader
 
 
-class Background(): 
-
-    def __init__(self, path: os.path): 
-        self.image = pygame.image.load(path)
-        self.height = self.image.get_height() 
-        self.rect = self.image.get_rect()
-
-    def rect_desc(self, num: int) -> tuple:
-        # The background is displayed lower by num, higher if num<0
-        return (self.rect.left, self.rect.top-num)
-    
-    
 class Window():
     def __init__(
         self,
@@ -45,10 +32,30 @@ class Window():
         self.width = width
         self.height = height
         self.win = pygame.display.set_mode((width, height))
-        self.background = Background(background)
+        self.background = pygame.image.load(background)
         self.font  = font
         self.clock = pygame.time.Clock()
         self.frame = 0 # The current nth frame.
+        self.title_font = pygame.font.Font(
+            Paths.FONT.value,
+            Titles.TITLE_SIZE.value
+        )
+        self.sub_font = pygame.font.Font(
+            Paths.FONT.value,
+            Titles.SUB_SIZE.value
+        )
+        self.button_font = pygame.font.Font(
+            Paths.FONT.value,
+            Buttons.SIZE.value
+        )
+        self.return_font = pygame.font.Font(
+            Paths.FONT.value,
+            Buttons.SIZE.value * 3 // 4
+        )
+        self.cell_font = pygame.font.Font(
+            Paths.FONT.value,
+            Table.SIZE.value
+        )
         self.score_font = pygame.font.Font(
             Paths.FONT.value,
             Score.SIZE.value
@@ -63,40 +70,148 @@ class Window():
         )
         pygame.display.set_caption("Space Invaders!")
 
-    def scroll(self) -> None:
-        """
-        Adds backgorund image and infinite scrolling.
-        """
-        frame = self.frame % self.background.height
-        # Represent the background shifted down according to frame
-        self.win.blit(self.background.image, self.background.rect_desc(frame))
-        # Blit a second background underneath the current one if the
-        # current one's lower border has shifted above the visible screen
-        if frame > self.background.height-self.height:
-            offset = frame - self.background.height
-            self.win.blit(
-                self.background.image,
-                self.background.rect_desc(offset)
-            )
+# Menu methods
 
-    def title(self) -> None:
-        """
-        Displays the title according to the title_time in Text.
-        """
-        if self.frame > Text.TITLE_TIME.value:
-            return None
-
-        title_text = pygame.font.Font(
-            Paths.FONT.value,
-            Text.TITLE_SIZE.value
-        ).render(Text.TITLE_TEXT.value, 1, Colors.WHITE.value)
-        title_x = Win.WIDTH.value//2 - title_text.get_width()//2
-        title_y = int(Win.HEIGHT.value * Text.TITLE_HEIGHT.value)
-
+    def blit_background(self):
+        # Display Background
         self.win.blit(
-            title_text,
+            self.background,
+            (0,0)
+        )
+    
+    def blit_title(self, text="Space Invaders"):
+        # Display Title
+        title = self.title_font.render(
+            text, 
+            1, 
+            Colors.WHITE.value
+        )
+        title_x = Win.WIDTH.value//2 - title.get_width()//2
+        title_y = Titles.TITLE_HEIGHT.value 
+        self.win.blit(
+            title,
             (title_x, title_y)
         )
+    
+    def blit_sub(self, text: str, height:int=-1):
+        if height == -1:
+            height = Titles.SUB_HEIGHT.value
+
+        sub = self.sub_font.render(text, 1, Colors.WHITE.value)
+        sub_x = Win.WIDTH.value//2 - sub.get_width()//2
+        sub_y = height 
+        self.win.blit(
+            sub,
+            (sub_x, sub_y)
+        )
+
+    def blit_button(self, text: str, height: int) -> pygame.Rect:
+        # Display Button
+        button = self.button_font.render(
+            text, 
+            1, 
+            Colors.WHITE.value
+        )
+        button_x = Win.WIDTH.value//2 - button.get_width()//2
+        button_y = height
+        self.win.blit(
+            button,
+            (button_x, button_y)
+        )
+        # Extract rectangle so you can return it
+        button_rect = button.get_rect().move(button_x, button_y)
+
+        return button_rect
+
+    def blit_return(self, text="Back", left=True) -> pygame.Rect:
+        #Display Return Button
+        ret = self.return_font.render(
+            text,
+            1,
+            Colors.WHITE.value
+        )
+        ret_x = Buttons.RET_X.value if left else\
+             Win.WIDTH.value - Buttons.RET_X.value - ret.get_rect().width
+        ret_y = Buttons.RET_Y.value 
+        self.win.blit(
+            ret,
+            (ret_x, ret_y)
+        )
+        # Update position of return rectangle
+        ret_rect = ret.get_rect().move(ret_x, ret_y)  
+
+        return ret_rect
+
+    def blit_cell(self, text: str, x: int, y: int) -> None:
+        # Displays table cell
+        cell = self.return_font.render(
+            str(text),
+            1,
+            Colors.WHITE.value
+        )
+        self.win.blit(
+            cell,
+            (x, y)
+        )
+
+    def welcome_back(self, name: str) -> None:
+        """
+        Displays screen welcoming a player who has played before.
+        """
+        self.blit_background()
+        self.blit_title(text=f"Welcome Back, {name}!")
+
+    def welcome_new(self, name: str) -> None:
+        """
+        Displays screen welcoming a player who has played before.
+        """
+        self.blit_background()
+        self.blit_title(text=f"Welcome {name}")
+
+        # Display instructions
+        self.blit_sub(text="Press the spacebar to shoot", height=400)
+        self.blit_sub(text="and the arrow keys to move", height=440)
+    
+    def get_input(self) -> pgti.TextInputVisualizer:
+        input = pgti.TextInputVisualizer(
+            font_object=self.button_font,
+            font_color=Colors.WHITE.value,
+            cursor_blink_interval=700,
+            cursor_color=Colors.WHITE.value
+        )
+        return input
+
+    def manage_input(self, input: pgti.TextInputVisualizer, events) -> None:
+        input.update(events)
+        input_x = (Win.WIDTH.value - input.surface.get_rect().width) // 2
+        input_y = Buttons.FIRST_Y.value + Buttons.SPACING.value
+        self.win.blit(input.surface,(input_x, input_y))
+
+# Game methods
+
+    def scroll(self) -> None:
+        """
+        Adds background image and infinite scrolling.
+        """
+        def rect_desc(num: int) -> tuple:
+            # The background is displayed lower by num, higher if num<0
+            return (self.background.get_rect().left, self.background.get_rect().top-num)
+
+        background_height = self.background.get_rect().height
+        frame = self.frame % background_height
+        # Represent the background shifted down according to frame
+        self.win.blit(
+            self.background, 
+            rect_desc(frame)
+        )
+        # Blit a second background underneath the current one if the
+        # current one's lower border has shifted above the visible screen
+        if frame > background_height-self.height:
+            offset = frame - background_height
+            self.win.blit(
+                self.background,
+                rect_desc(offset)
+            )
 
     def health(self, space_ship: SpaceShip, base: Base) -> None:
         """
@@ -130,48 +245,6 @@ class Window():
             score_text,
             (score_x, score_y)
         )
-
-    def game_over(self) -> None:
-        """
-        Handles the game over screen. Renders the associated texts 
-        and displays them.
-        """
-        # Title info
-        game_over_text = pygame.font.Font(
-            Paths.FONT.value,
-            Text.TITLE_SIZE.value
-        ).render(Text.GAME_OVER_TEXT.value, 1, Colors.WHITE.value)
-        game_over_x = Win.WIDTH.value//2 - game_over_text.get_width()//2
-        game_over_y = int(Win.HEIGHT.value * Text.TITLE_HEIGHT.value)
-        # Caption 1 info
-        sub_text_1 = pygame.font.Font(
-            Paths.FONT.value,
-            Text.SUB_SIZE.value
-        ).render(Text.SUB_ONE_TEXT.value, 1, Colors.WHITE.value)
-        sub_x_1 = Win.WIDTH.value//2 - sub_text_1.get_width()//2
-        sub_y_1 = int(Win.HEIGHT.value * Text.SUB_HEIGHT_ONE.value)
-        # Caption 2 info
-        sub_text_2 = pygame.font.Font(
-            Paths.FONT.value,
-            Text.SUB_SIZE.value
-        ).render(Text.SUB_TWO_TEXT.value, 1, Colors.WHITE.value)
-        sub_x_2 = Win.WIDTH.value//2 - sub_text_2.get_width()//2
-        sub_y_2 = sub_y_1 + sub_text_1.get_height()
-        # Display on screen
-        self.win.blit(
-            game_over_text,
-            (game_over_x, game_over_y)
-        )
-        self.win.blit(
-            sub_text_1,
-            (sub_x_1, sub_y_1)
-        )
-        self.win.blit(
-            sub_text_2,
-            (sub_x_2, sub_y_2)
-        )
-        # Update
-        self.update()
 
     def update_ship(self, ship: SpaceShip) -> None:
         """
@@ -216,3 +289,6 @@ class Window():
 
     def get_frame(self):
         return self.frame
+
+    def get_win(self):
+        return self.win

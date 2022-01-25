@@ -19,25 +19,13 @@ from .sound import Sound
 from .window import Window
 from .spawner import Spawner
 from .space_ship import SpaceShip
-from .constants import Win, Paths, Ship, Spawning, BASE_LIVES
+from .constants import Paths, Ship, Spawning, BASE_LIVES
 
 class Game():
 
-    def __init__(self):
-        pygame.init()
-
-        self.sound = Sound(
-            soundtrack=Paths.SOUNDTRACK.value,
-            game_over=Paths.GAME_OVER.value,
-            laser=Paths.LASER_SOUND.value
-        )
-        self.screen = Window(
-            fps=Win.FPS.value,
-            font=Paths.FONT.value,
-            width=Win.WIDTH.value,
-            height=Win.HEIGHT.value,
-            background=Paths.BACKGROUND.value
-        )
+    def __init__(self, sound: Sound, screen: Window):
+        self.sound = sound
+        self.screen = screen
         self.space_ship = SpaceShip(
             vel=Ship.VEL.value,
             lives=Ship.LIVES.value,
@@ -57,8 +45,8 @@ class Game():
         )
         # Spawn the invaders!
         self.invaders = self.spawner.init_spawn()
-        self.lasers = []
         self.base = Base(lives=BASE_LIVES)
+        self.lasers = []
         self.score = 0
 
     def run(self) -> bool:
@@ -78,7 +66,7 @@ class Game():
              
             # # check for game over
             if self.space_ship.is_destroyed() or self.base.is_destroyed():
-                return self.game_over()
+                return self.score
             # tick clock, update frame count
             self.screen.update_frame()
             self.screen.scroll()
@@ -141,28 +129,14 @@ class Game():
             # Display health and score
             self.screen.health(self.space_ship, self.base)
             self.screen.score(self.score)
-            # If it's the start, display the title
-            self.screen.title()
             # Update the screen
             self.screen.update()
 
-    def game_over(self):
-        """
-        Handles game over. Calls game over screen in window, changes music,
-        and supports the iterative restart in the main file.
-        Returns true if the game should restart.
-        """
-        # Stop music and play sound
-        self.sound.play_game_over()
-        
-        while True:
-            # Check for r press
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:
-                        return True
-                    elif event.key == pygame.K_q:
-                        return False
-            # Update screen
-            self.screen.game_over()
-            self.screen.update_frame(fps=15)
+    # def update_collisions(self):
+    #     """
+    #     Updates the lasers and invader lists for collisions.
+
+    #     Takes advantage of the inherent ordering of both the invader 
+    #     and laser lists along the y axis.
+    #     """
+

@@ -7,8 +7,9 @@ Music class, to abstract from pygame music interface and bug fix.
 import pygame, wave
 
 class Sound():
-    def __init__(self, soundtrack, game_over, laser) -> None:
+    def __init__(self, menu_soundtrack, soundtrack, game_over, laser) -> None:
         self.soundtrack = soundtrack
+        self.menu = menu_soundtrack
         self.game_over = game_over
 
         # To avoid frequency bug, restart mixer
@@ -26,7 +27,16 @@ class Sound():
         """
         Plays soundtrack. Default is "soundtrack.mp3".
         """
+        pygame.mixer.music.stop()
         pygame.mixer.music.load(self.soundtrack)
+        pygame.mixer.music.play(-1) # -1 is infinite loop
+
+    def play_menu(self):
+        """
+        Plays soundtrack. Default is "soundtrack.mp3".
+        """
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(self.menu)
         pygame.mixer.music.play(-1) # -1 is infinite loop
 
     def play_game_over(self):

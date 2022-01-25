@@ -6,15 +6,14 @@ The restart is iterative as opposed to recursive (i.e. if the player chooses to
 restart, main is not called within main) to avoid a stack overflow upon successive
 restarts.
 """ 
-from src.game import Game
+from src.menu import Menu
 
 def main(status=True):
     """
     Plays game, restarts iteratively if player chooses to restart.
     """
-    while status:
-        game = Game()
-        status = game.run()
+    menu = Menu()
+    menu.main()
 
 if __name__ == "__main__":
     main()

@@ -26,11 +26,13 @@ import os
 from enum import Enum
 
 class Paths(Enum):
+    MENU_SOUNDTRACK = os.path.join("assets", "menu.wav")
     BACKGROUND = os.path.join("assets", "background.png")
     SOUNDTRACK = os.path.join("assets", "soundtrack.wav")
     GAME_OVER = os.path.join("assets", "game_over.wav")
-    EARTH = os.path.join("assets", "earth.png")
     SHIP = os.path.join("assets", "space_ship.png")
+    EARTH = os.path.join("assets", "earth.png")
+    MENU = os.path.join("assets", "menu.wav")
     FONT = os.path.join("assets", "arcade.TTF")
     HEART = os.path.join("assets", "heart.png")
     TITLE = os.path.join("assets", "title.png")
@@ -51,19 +53,14 @@ class Colors(Enum):
 
 class Win(Enum):
     FPS = 60
-    WIDTH = 640 # = 256 * 2.5
-    HEIGHT = 600 # = 224 * 2.5 + 40 (padding height)
+    WIDTH = 640 
+    HEIGHT = 600 
 
-class Text(Enum):
-    TITLE_TEXT = "Space Invaders"
-    GAME_OVER_TEXT = "Game Over"
-    SUB_ONE_TEXT = "Press R to restart"
-    SUB_TWO_TEXT = "Press Q to quit"
-    TITLE_TIME = 120
+class Titles(Enum):
     TITLE_SIZE = 60
-    TITLE_HEIGHT = 1/4 # relative to height
+    TITLE_HEIGHT = 100 # Win.HEIGHT * 0.25
+    SUB_HEIGHT = 150 # TITLE_HEIGHT + 60 + 10
     SUB_SIZE = 30
-    SUB_HEIGHT_ONE = 0.7 # ^^
 
 class Health(Enum):
     HEIGHT = 32 # 105 / 3, also the side of the square castle
@@ -74,6 +71,20 @@ class Health(Enum):
 class Score(Enum):
     SIZE = 40
     PADDING = 6
+
+class Buttons(Enum):
+    SIZE = 50
+    RET_SIZE = 37 # ~ 3/4 * 50
+    RET_X = 30
+    RET_Y = 540
+    FIRST_Y = 300
+    SPACING = 60 # size + 10
+
+class Table(Enum):
+    SIZE = 35
+    FIRST_Y = 200
+    SPACING = 43
+    PADDING = 70
 
 class Ship(Enum):
     VEL = 5 # velocity

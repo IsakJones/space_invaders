@@ -15,3 +15,5 @@ space_ship will likely be destroyed.
 
 In the game over screen, the player can press either "R" to restart the game,
 or "Q" to quit.
+
+ - make virtual env

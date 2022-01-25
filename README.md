@@ -1,6 +1,7 @@
-
-![Screenshot](./assets/screenshot.png)
-<h2 align="center"><i>Space Invaders!</i></h2>
+<div align="center">
+    <img alt="Screenshot" src="https://github.com/sekerez/space_invaders/assets/screenshot.png">
+    <h2><i>Space Invaders!</i></h2>
+</div>
 
 <p align="center">
   <a href="https://travis-ci.org/github/cdkini/Omni">

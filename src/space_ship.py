@@ -16,7 +16,7 @@ After it is hit, the spaceship cannot be hit again according to the delay
 delay attribute, i.e. the amount in seconds that the ship should be immune,
 and the last_hit attribute, which stores the last frame when the ship was hit.
 """
-from pathlib import Path
+
 import pygame
 import os
 

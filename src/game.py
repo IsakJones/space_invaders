@@ -1,20 +1,20 @@
 """
 DOCSTRING
 
-The game object handles the flow of the game and everything that isn't handled by
-another dedicated object. Hence is starts the game, with the main objects (i.e. the
-screen, the invaders, the spaceship etc.) as its own attributes. Methods handle sound
-effects, which I didn't feel needed a dedicated object, and the flow of the game over
-screen.
+The game object handles the game logic. It starts the game by initializing
+the main objects (i.e. the invaders, the spaceship etc.) as its own attributes. 
+There is only one method, run. The Game object makes reference to every object in
+the module except for the Menu object, the DB object, and the abstract classes.
+It makes extensive use of the Window object to update the display.
 
-All attributes' initializing variables are pulled from their respective enum.
-Changing initializing variables for the sake of testing should be done in the enums file.
+All attributes' initializing variables are pulled from their respective "enum".
+Changing initializing variables for testing should be done in the constats file.
 """
 
 import pygame
 import os
 
-from .base import Base
+from .earth import Earth
 from .sound import Sound
 from .window import Window
 from .spawner import Spawner
@@ -24,8 +24,10 @@ from .constants import Paths, Ship, Spawning, BASE_LIVES
 class Game():
 
     def __init__(self, sound: Sound, screen: Window):
+        # use sound and screen from menu
         self.sound = sound
         self.screen = screen
+        # define player-controlled spaceship and spawner
         self.space_ship = SpaceShip(
             vel=Ship.VEL.value,
             lives=Ship.LIVES.value,
@@ -45,7 +47,7 @@ class Game():
         )
         # Spawn the invaders!
         self.invaders = self.spawner.init_spawn()
-        self.base = Base(lives=BASE_LIVES)
+        self.earth = Earth(lives=BASE_LIVES)
         self.lasers = []
         self.score = 0
 
@@ -65,7 +67,7 @@ class Game():
                     break
              
             # # check for game over
-            if self.space_ship.is_destroyed() or self.base.is_destroyed():
+            if self.space_ship.is_destroyed() or self.earth.is_destroyed():
                 return self.score
             # tick clock, update frame count
             self.screen.update_frame()
@@ -77,10 +79,11 @@ class Game():
 
             # check if any lasers are out of bounds
             # works because lasers are naturally sorted from highest to lowest
-            while self.lasers and self.lasers[0].out_of_bounds():
-                self.lasers = self.lasers[1:]
+            # and player can at most shoot one laser per frame
+            if self.lasers and self.lasers[0].out_of_bounds():
+                del self.lasers[0]
 
-            # check if a laserjhas hit an invader
+            # check if a laser has hit an invader
             invaders_to_remove = set()
             lasers_to_remove = set()
             
@@ -113,8 +116,8 @@ class Game():
                 # Update location
                 self.screen.update_invader(invader)
                 # Check if it's reached the base
-                if self.base.is_hit(invader):
-                    self.base.lose_life()
+                if self.earth.is_hit(invader):
+                    self.earth.lose_life()
                     # print("An invader has reached your base!")
                     self.invaders.remove(invader)
                 # Check if it's run against the ship
@@ -123,20 +126,12 @@ class Game():
                     # print(f"The ship still has {self.space_ship.get_lives()} lives.")
                     self.invaders.remove(invader)
 
-            # Ship
+            # Only display the ship if it has full health
             if not self.space_ship.is_destroyed():
                 self.screen.update_ship(self.space_ship)
             # Display health and score
-            self.screen.health(self.space_ship, self.base)
+            self.screen.health(self.space_ship, self.earth)
             self.screen.score(self.score)
             # Update the screen
             self.screen.update()
-
-    # def update_collisions(self):
-    #     """
-    #     Updates the lasers and invader lists for collisions.
-
-    #     Takes advantage of the inherent ordering of both the invader 
-    #     and laser lists along the y axis.
-    #     """
 

@@ -1,11 +1,10 @@
 """
 DOCSTRING
 
-This is the file for the bullet class.
+This is the file for the laser class, which has no inheritance.
 """
 
 import pygame
-import os
 
 from .constants import Laserconst
 

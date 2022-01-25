@@ -1,3 +1,9 @@
+"""
+DOCSTRING
+
+Loads environment variables and generates database connection URI.
+"""
+
 from sqlalchemy.engine.url import URL
 from dotenv import load_dotenv
 import os

@@ -1,7 +1,7 @@
 """
 DOCSTRING
 
-Object reppresenting the terrifying space invaders!
+Object reppresenting the space invader!
 Just like creature, but with custom motion that 
 constantly points downwards with randomized swerving.
 """
@@ -30,6 +30,9 @@ class SpaceInvader(Creature):
         self.direction = random.choice([True, False]) 
         # the swerve direction switches every 1 to 2 seconds
         self.switch_time = int(Win.FPS.value * (1 + random.uniform(0, 1)))
+        # but the swerve interval must reset to keep invader from repeatedly
+        # 'bouncing' off the wall
+        self.offset = 0
 
     def move(self, frame: int) -> None:
         """
@@ -38,13 +41,21 @@ class SpaceInvader(Creature):
         according to self.switch_time, and also whether it bumps against one of
         the walls. Condition left and right are true if it bumps against either.
         """
-        frame = frame % self.switch_time
+        frame = (frame - self.offset) % self.switch_time 
         # If the invader is too far right, swerve left
         if 0 <= self.rect.x - Win.WIDTH.value + self.rect.width <= self.vel-1:
             self.direction = False
+            # If it's about to switch again, change the offset
+            if self.switch_time > frame > int(self.switch_time * 0.8):
+                self.offset += frame
+
         # If the invader is too far left, swerve right
-        if 0 <= self.rect.x <= self.vel-1:
+        elif 0 <= self.rect.x <= self.vel-1:
             self.direction = True
+            # If it's about to switch again, change the offset
+            if self.switch_time > frame > int(self.switch_time * 0.8):
+                self.offset += frame
+
         # Each switch time, change direction
         elif frame == 0:
             self.direction = not self.direction 

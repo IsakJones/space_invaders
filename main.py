@@ -1,19 +1,18 @@
 """ 
 DOCSTRING
     
-This file contains the main function, which runs the game and handles the restart.
-The restart is iterative as opposed to recursive (i.e. if the player chooses to 
-restart, main is not called within main) to avoid a stack overflow upon successive
-restarts.
+This file contains the main function, which creates a Menu object.
+The Menu object handles all control flow and game logic.
 """ 
+
 from src.menu import Menu
 
-def main(status=True):
+def main():
     """
-    Plays game, restarts iteratively if player chooses to restart.
+    Creates menu object and calls function for main menu.
     """
     menu = Menu()
-    menu.main()
+    menu.start()
 
 if __name__ == "__main__":
     main()

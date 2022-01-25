@@ -1,3 +1,9 @@
+"""
+DOCSTRING
+
+The models store information on the players and their individual games.
+
+"""
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -5,6 +11,9 @@ from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 class Player(Base):
+    """
+    A table for players. Includes name and high score.
+    """
     __tablename__ = "players"
     id = Column(Integer, primary_key=True)
     name = Column(String(20), unique=True)
@@ -15,6 +24,9 @@ class Player(Base):
         return f"<Player (name = '{self.name}', high score = {self.high_score})>"
 
 class Game(Base):
+    """
+    A table for individual games. Includes player id, date, and score. 
+    """
     __tablename__ = "games"
     id = Column(Integer, primary_key=True)
     score = Column(Integer)

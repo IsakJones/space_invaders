@@ -1,10 +1,15 @@
 """
 DOCSTRING
 
-Music class, to abstract from pygame music interface and bug fix.
+The Sound class handles all sound in the game, including the menu song,
+the game song, the game over sound, and the laser sound. It also fixes a bug
+where the pygame mixer played sound sped up by leveraging the wave library
+and specifying a frequency.
+
 """
 
-import pygame, wave
+import pygame
+import wave
 
 class Sound():
     def __init__(self, menu_soundtrack, soundtrack, game_over, laser) -> None:

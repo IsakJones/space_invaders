@@ -1,18 +1,26 @@
 """
 DOCSTRING
 
-This file includes all objects handling visual changes.
+The Window object handles all surfaces on display. Hence it is responsible for visuals
+in both the menus and the main game. Hence menus are divided between those that serve
+the main menu, and those that serve the main game.
 
-The Window object handles all surfaces on display. It also handles the clock, which 
-dictates the game's pace, and includes an attribute tracking the frame number, which is
-important for many methods. The background, hearts, and earth icons are also attributes.
+For the main menu, it mostly provides methods that display components on the screen.
+But it lets the Menu object handle the component logic, for instance whether a button
+is clicked. At times, it even allows the Menu to choose the X and Y coordinates of the
+component. Component "fonts" are methods.
+
+For the game, it displays all objects on the screen and directs the scrolling in the 
+background. It also handles the clock, which dictates the game's pace, and includes 
+an attribute tracking the frame number, which is important for many methods. 
+The background, hearts, and earth icons are also attributes.
 """
-from curses.ascii import SUB
+
 import pygame_textinput as pgti
 import pygame
 import os
 
-from .base import Base
+from .earth import Earth
 from .laser import Laser
 from .space_ship import SpaceShip
 from .constants import Paths, Colors, Titles, Win, Health, Score, Buttons, Table
@@ -72,14 +80,14 @@ class Window():
 
 # Menu methods
 
-    def blit_background(self):
+    def blit_background(self) -> None:
         # Display Background
         self.win.blit(
             self.background,
             (0,0)
         )
     
-    def blit_title(self, text="Space Invaders"):
+    def blit_title(self, text="Space Invaders") -> None:
         # Display Title
         title = self.title_font.render(
             text, 
@@ -93,7 +101,8 @@ class Window():
             (title_x, title_y)
         )
     
-    def blit_sub(self, text: str, height:int=-1):
+    def blit_sub(self, text: str, height:int=-1) -> None:
+        # Display subtitle
         if height == -1:
             height = Titles.SUB_HEIGHT.value
 
@@ -124,7 +133,7 @@ class Window():
         return button_rect
 
     def blit_return(self, text="Back", left=True) -> pygame.Rect:
-        #Display Return Button
+        # Display Return Button, or alternatively Prev or Next Buttons
         ret = self.return_font.render(
             text,
             1,
@@ -145,7 +154,7 @@ class Window():
     def blit_cell(self, text: str, x: int, y: int) -> None:
         # Displays table cell
         cell = self.return_font.render(
-            str(text),
+            text,
             1,
             Colors.WHITE.value
         )
@@ -159,7 +168,7 @@ class Window():
         Displays screen welcoming a player who has played before.
         """
         self.blit_background()
-        self.blit_title(text=f"Welcome Back, {name}!")
+        self.blit_title(text=f"Welcome Back, {name}")
 
     def welcome_new(self, name: str) -> None:
         """
@@ -173,6 +182,9 @@ class Window():
         self.blit_sub(text="and the arrow keys to move", height=440)
     
     def get_input(self) -> pgti.TextInputVisualizer:
+        """
+        Returns the TextInputVisualizer component, which handles user input.
+        """
         input = pgti.TextInputVisualizer(
             font_object=self.button_font,
             font_color=Colors.WHITE.value,
@@ -182,6 +194,10 @@ class Window():
         return input
 
     def manage_input(self, input: pgti.TextInputVisualizer, events) -> None:
+        """
+        Upddates the textInputVisualizer component by displaying it on the
+        screen and adding text according to user key input.
+        """
         input.update(events)
         input_x = (Win.WIDTH.value - input.surface.get_rect().width) // 2
         input_y = Buttons.FIRST_Y.value + Buttons.SPACING.value
@@ -213,9 +229,9 @@ class Window():
                 rect_desc(offset)
             )
 
-    def health(self, space_ship: SpaceShip, base: Base) -> None:
+    def health(self, space_ship: SpaceShip, earth: Earth) -> None:
         """
-        Displays the health count for both the ship and the base.
+        Displays the health count for both the ship and the earth.
         """
         # Display ship health
         for life in range(space_ship.get_lives()):
@@ -224,8 +240,8 @@ class Window():
                 self.heart,
                 (heart_x, Health.Y.value)
             )
-        # Display base health
-        for life in range(base.get_lives()):
+        # Display earth health
+        for life in range(earth.get_lives()):
             earth_x = Health.SPACING.value * (life+1) + Health.HEIGHT.value * (life+1)
             # the HEIGHT is also the earth's side
             self.win.blit(
@@ -275,9 +291,8 @@ class Window():
         Updates the laser position based on its speed.
         The function is called before new lasers are spawned so that
         the newly spawned lasers' y position is the same as the spaceship's,
-        and not increased by vel.
-        Also, so that the ship's surface covers that of any lasers coming out
-        of it.
+        and not increased by vel. Also, so that the ship's surface covers 
+        that of any lasers coming out of it.
         """
         self.win.blit(laser.get_image(), laser.get_rect())
 
@@ -289,6 +304,3 @@ class Window():
 
     def get_frame(self):
         return self.frame
-
-    def get_win(self):
-        return self.win

@@ -1,7 +1,7 @@
 """
 DOCSTRING
 
-Includes abstract classes for Base, SpaceShip and SpaceInvader.
+Includes abstract classes for Earth, SpaceShip and SpaceInvader.
 
 Thing only includes lives, as all three classes above have them.
 Creature handles more attributes for visual objects such as SpaceShip and SpaceInvader.
@@ -12,7 +12,7 @@ import os
 
 class Thing():
     """
-    Abstract class shared by Base, SpaceShip and SpaceInvader.
+    Abstract class shared by Earth, SpaceShip and SpaceInvader.
     Only includes lives attribute and related methods.
     """
     def __init__(self, lives: int):

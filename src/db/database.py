@@ -1,3 +1,12 @@
+"""
+DOCSTRING
+
+The DB object handles the connection with the PostgresQL database server.
+Queries, inserts, and updates take place within a session according to the
+SQLAlchemy API. The tables are defined in the models.py file.
+
+"""
+
 from sqlalchemy import create_engine, update, func
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
@@ -47,7 +56,7 @@ class DB():
         """
         with self._session_scope() as s:
             players = s.query(Player).all()
-            return [(player.name, player.high_score) for player in players]
+            return [(player.name, str(player.high_score)) for player in players]
 
     def get_games(self) -> list:
         """
@@ -56,7 +65,7 @@ class DB():
         with self._session_scope() as s:
             games = s.query(Game, Player).join(Player).all()
             print(games[0])
-            return [(player.name, game.score, game.date.strftime("%d/%m/%y")) for game, player in games]
+            return [(player.name, str(game.score), game.date.strftime("%d/%m/%y")) for game, player in games]
 
     def add_game(self, name: str, score: int) -> None:
         is_high_score = False
@@ -71,6 +80,7 @@ class DB():
             s.add(game)
             # Update the high score
             if score > player.high_score:
+                # Don't notify the high score if it's the player's first time
                 is_high_score = player.high_score != 0
                 s.execute(
                     update(Player).

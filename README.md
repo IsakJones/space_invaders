@@ -3,18 +3,18 @@
 </div>
 
 <p align="center">
-  <p>
+  <a>
     <img alt="Python" src="https://img.shields.io/badge/Python-3.8.10-green">
-  </p> 
-  <p>
+  </a> 
+  <a>
     <img alt="Pygame" src="https://img.shields.io/badge/Pygame-2.1.2-yellow">
-  </p> 
-  <p>
+  </a> 
+  <a>
     <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-12.9-blue">
-  </p> 
-  <p>
+  </a> 
+  <a>
     <img alt="License" src="https://img.shields.io/badge/License-MIT-red">
-  </p>
+  </a>
 </p>
 
 ### Intro
